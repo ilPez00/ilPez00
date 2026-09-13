@@ -2,9 +2,10 @@
 
 **I build self-healing systems with as little AI as the job allows.**
 
-Twenty-seven, in Verona. Three systems — in Rust, TypeScript and Python — running on a mesh
-of machines I own and operate. The pattern is always the same: declare the intended state,
-measure the real one, make the gap visible, correct it. Every layer that can be deterministic
+Twenty-seven, in Verona. Three systems — in Rust, TypeScript and Python — on a mesh of machines
+I own and operate. One of the three generates that mesh and runs it: plug a machine in and it
+configures itself. The pattern is always the same: declare the intended state, measure the real
+one, make the gap visible, correct it. Every layer that can be deterministic
 is deterministic. A model gets called only where nothing cheaper works, and it is an
 interface, never the foundation.
 
@@ -58,14 +59,24 @@ structure that produced it.*
 
 `Rust` · `Apache-2.0` · `ONNX` · `MCP`
 
-**[aion](https://github.com/ilPez00/aion)** — the mesh controller for the machines the other
-two run on. One cockpit probes every service on every node — TCP, HTTP health or systemd —
-and drives lifecycle over SSH. Topology is declared once in the mesh config and consumed,
-never hardcoded, so operator intent decides what runs and drift shows up as a diff instead of
-a stale HUD. Instance discovery is a file heartbeat with the port derived from the instance
-name: no daemon, no mDNS, no port scan. One `Intent` type for every input device — keyboard,
-gamepad, voice, a custom hardware deck — and every backend a swappable harness.
-*A dead node is a state, not an outage: the fleet reports it and routes around it.*
+**[aion](https://github.com/ilPez00/aion)** — the mesh. Not a controller sitting beside one:
+aion generates the mesh and runs it. RandoMesh is that mesh written down — documentation,
+not a second codebase.
+
+Plug a machine in and it configures itself. aion provisions the control plane over SSH with
+idempotent installers, systemd units and timers (*disable* is deliberately not *uninstall*),
+then owns the lifecycle of everything running there — Praxis, physis, llama-server inference
+nodes, gateways. Topology is emitted into the fleet config and read back on every probe, so
+operator intent beats built-in defaults and drift shows up as a diff instead of a stale HUD.
+Zero registry by design: an instance's name derives its port, discovery is a file heartbeat,
+and there is nothing to register a new node with — no daemon, no mDNS, no port scan. Cross-node
+transport is an SSH tunnel rather than a hand-rolled TLS/PKI stack: encryption, host
+authentication and per-peer keys for no new protocol code.
+
+One cockpit probes every service on every node — TCP, HTTP health or systemd — and drives it.
+One `Intent` type for every input device: keyboard, gamepad, voice, a custom hardware deck.
+Every backend a swappable harness. *A dead node is a state, not an outage: the mesh reports it
+and routes around it.*
 
 `Python` · `asyncio` · `SSH` · `systemd`
 
