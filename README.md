@@ -1,4 +1,4 @@
-# gio
+# Giovanni Pezzin (ilPez00) — Rust Systems Engineer | Self-Healing Infrastructure & AI World Models
 
 **I build self-healing systems with as little AI as the job allows.**
 
